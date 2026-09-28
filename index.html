@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J.A.R.V.I.S. — Stark Holographic Core Ultimate</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --emotion-color: #00f3ff;
+      --emotion-glow: rgba(0, 243, 255, 0.75);
+      --bg-deep: #000205;
+      --panel-bg: rgba(1, 10, 20, 0.92);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-deep);
+      color: var(--emotion-color);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: color 0.5s ease;
+      position: relative;
+    }
+
+    /* Scanlines + noise */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0, 243, 255, 0.03) 2px, rgba(0, 243, 255, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 9998;
+      animation: scan 8s linear infinite;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.5;
+      animation: noise 0.18s steps(2) infinite;
+    }
+    @keyframes scan { to { transform: translateY(40px); } }
+    @keyframes noise { 0%,100%{opacity:.4} 50%{opacity:.6} }
+
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,243,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,243,255,.025) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 0;
+    }
+
+    .stage {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 12px 12px 40px;
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+
+    /* ===== HOLOGRAM 3D IRON MAN ===== */
+    .holo-scene {
+      position: relative;
+      height: 340px;
+      perspective: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: -5px;
+    }
+
+    .holo-bust-wrap {
+      position: relative;
+      width: 200px;
+      height: 260px;
+      transform-style: preserve-3d;
+      animation: float3d 5.5s ease-in-out infinite alternate;
+      z-index: 20;
+    }
+
+    .holo-bust {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter:
+        drop-shadow(0 0 16px var(--emotion-glow))
+        drop-shadow(0 0 35px rgba(0,180,255,.3))
+        brightness(1.12) contrast(1.12) saturate(1.25);
+      animation: holo-glitch 9s infinite, subtle-rot 12s ease-in-out infinite alternate;
+      -webkit-mask-image: radial-gradient(ellipse 85% 90% at 50% 45%, #000 55%, transparent 100%);
+      mask-image: radial-gradient(ellipse 85% 90% at 50% 45%, #000 55%, transparent 100%);
+    }
+
+    .holo-bust-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 8% 12%;
+      background: radial-gradient(ellipse, var(--emotion-glow) 0%, transparent 70%);
+      filter: blur(18px);
+      z-index: 1;
+      animation: glow-pulse 2.6s ease-in-out infinite alternate;
+      transition: background 0.5s ease;
+    }
+
+    .holo-bust-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,243,255,.07) 3px, rgba(0,243,255,.07) 5px
+      );
+      pointer-events: none;
+      z-index: 10;
+      mix-blend-mode: screen;
+      opacity: .65;
+      animation: scan-bust 4s linear infinite;
+    }
+
+    @keyframes float3d {
+      0% { transform: translateY(0) translateZ(0) rotateX(2deg); }
+      100% { transform: translateY(-16px) translateZ(28px) rotateX(-3deg); }
+    }
+    @keyframes subtle-rot {
+      0% { transform: rotateY(-5deg) rotateZ(-1deg); }
+      100% { transform: rotateY(5deg) rotateZ(1deg); }
+    }
+    @keyframes holo-glitch {
+      0%,91%,100% { filter: drop-shadow(0 0 16px var(--emotion-glow)) drop-shadow(0 0 35px rgba(0,180,255,.3)) brightness(1.12) contrast(1.12) saturate(1.25); }
+      92% { filter: drop-shadow(0 0 16px var(--emotion-glow)) brightness(1.3) contrast(1.4) hue-rotate(12deg); transform: translate(-2px,1px); }
+      93% { filter: drop-shadow(0 0 16px rgba(255,0,180,.4)) brightness(1.1) hue-rotate(-18deg); transform: translate(2px,-1px); }
+      94% { transform: translate(0); }
+    }
+    @keyframes glow-pulse {
+      0% { opacity: .45; transform: scale(.95); }
+      100% { opacity: 1; transform: scale(1.08); }
+    }
+    @keyframes scan-bust { to { background-position: 0 40px; } }
+
+    .holo-beam {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 140px;
+      background: linear-gradient(to bottom, rgba(0,243,255,.5) 0%, rgba(0,180,255,.22) 40%, transparent 100%);
+      clip-path: polygon(36% 0%, 64% 0%, 100% 100%, 0% 100%);
+      filter: blur(1.2px);
+      animation: beam-pulse 3s ease-in-out infinite alternate;
+      z-index: 8;
+      transition: background 0.5s ease;
+    }
+    .holo-beam::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255,255,255,.3), transparent 40%);
+      clip-path: inherit;
+      animation: beam-scan 2.6s linear infinite;
+    }
+    @keyframes beam-pulse { 0%{opacity:.6} 100%{opacity:1} }
+    @keyframes beam-scan {
+      0% { transform: translateY(-120%); opacity: 0; }
+      40% { opacity: .6; }
+      100% { transform: translateY(120%); opacity: 0; }
+    }
+
+    #particles {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      height: 300px;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    /* Platform */
+    .holo-platform {
+      position: relative;
+      width: 280px;
+      height: 80px;
+      margin: 0 auto 22px;
+      perspective: 480px;
+    }
+    .ring {
+      position: absolute;
+      left: 50%; top: 50%;
+      border: 2px solid var(--emotion-color);
+      border-radius: 50%;
+      transform: translate(-50%,-50%) rotateX(72deg);
+      box-shadow: 0 0 16px var(--emotion-glow), inset 0 0 10px rgba(0,243,255,.25);
+      transition: border-color .5s, box-shadow .5s;
+    }
+    .ring-1 { width: 260px; height: 70px; animation: spin 18s linear infinite; opacity: .9; }
+    .ring-2 { width: 195px; height: 53px; animation: spin-rev 12s linear infinite; border-style: dashed; opacity: .7; }
+    .ring-3 { width: 130px; height: 36px; animation: spin 8s linear infinite; opacity: .85; }
+    .ring-core {
+      width: 48px; height: 14px;
+      background: radial-gradient(circle, #fff 0%, var(--emotion-color) 45%, transparent 75%);
+      border: none;
+      box-shadow: 0 0 24px #fff, 0 0 50px var(--emotion-color);
+      animation: core-glow 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes spin { to { transform: translate(-50%,-50%) rotateX(72deg) rotateZ(360deg); } }
+    @keyframes spin-rev { to { transform: translate(-50%,-50%) rotateX(72deg) rotateZ(-360deg); } }
+    @keyframes core-glow {
+      0% { box-shadow: 0 0 16px #fff, 0 0 32px var(--emotion-color); }
+      100% { box-shadow: 0 0 28px #fff, 0 0 60px var(--emotion-color), 0 0 90px rgba(0,243,255,.4); }
+    }
+
+    /* ===== DASHBOARD ===== */
+    .main-panel {
+      width: 100%;
+      border: 2px solid var(--emotion-color);
+      box-shadow: 0 0 32px var(--emotion-glow);
+      background: var(--panel-bg);
+      padding: 18px;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      transition: border-color .5s, box-shadow .5s;
+      position: relative;
+      overflow: hidden;
+    }
+    .main-panel::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -80%;
+      width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,243,255,.07), transparent);
+      animation: panel-scan 7s ease-in-out infinite;
+    }
+    @keyframes panel-scan {
+      0% { left: -80%; }
+      45%,100% { left: 160%; }
+    }
+
+    .header-status {
+      grid-column: span 2;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-bottom: 1px dashed var(--emotion-color);
+      padding-bottom: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+      transition: border-color .5s;
+    }
+
+    .section-box { display: flex; flex-direction: column; gap: 10px; }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      border-left: 3px solid var(--emotion-color);
+      padding-left: 8px;
+      letter-spacing: 1px;
+      transition: border-color .5s;
+    }
+
+    .input-box {
+      width: 100%;
+      background: #000;
+      border: 1px solid var(--emotion-color);
+      color: var(--emotion-color);
+      padding: 11px;
+      font-family: 'Share Tech Mono', monospace;
+      border-radius: 4px;
+      outline: none;
+      font-size: 13px;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .input-box:focus {
+      box-shadow: 0 0 12px var(--emotion-glow);
+    }
+
+    .btn-stark {
+      background: rgba(0,243,255,.12);
+      border: 1px solid var(--emotion-color);
+      color: var(--emotion-color);
+      padding: 11px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: .25s;
+      text-align: center;
+      letter-spacing: 1px;
+      font-size: 12px;
+    }
+    .btn-stark:hover {
+      background: var(--emotion-color);
+      color: #000;
+      box-shadow: 0 0 18px var(--emotion-glow);
+    }
+    .btn-stark:active { transform: scale(.97); }
+
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .chat-history {
+      background: rgba(0,0,0,.8);
+      border: 1px solid rgba(0,243,255,.35);
+      padding: 10px;
+      border-radius: 4px;
+      height: 230px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-message {
+      padding: 7px 9px;
+      border-radius: 4px;
+      max-width: 92%;
+      word-break: break-word;
+    }
+    .chat-user {
+      background: rgba(0,243,255,.1);
+      border-left: 3px solid var(--emotion-color);
+      align-self: flex-end;
+      color: #fff;
+    }
+    .chat-jarvis {
+      background: rgba(0,0,0,.55);
+      border-left: 3px solid #7000ff;
+      align-self: flex-start;
+      color: #c0e8ff;
+    }
+
+    .info-row { font-size: 12px; color: #8ce3eb; margin-bottom: 2px; }
+
+    .voice-btn {
+      background: rgba(0,243,255,.05);
+      border-style: dashed;
+      padding: 8px;
+    }
+
+    #voice-status { font-size: 11px; color: #5ad1d9; min-height: 16px; }
+
+    @media (max-width: 720px) {
+      .main-panel { grid-template-columns: 1fr; }
+      .header-status { grid-column: span 1; }
+      .holo-bust-wrap { width: 160px; height: 210px; }
+      .holo-scene { height: 280px; }
+      .chat-history { height: 180px; }
+      .holo-platform { width: 220px; }
+      .ring-1 { width: 200px; height: 54px; }
+      .ring-2 { width: 150px; height: 42px; }
+      .ring-3 { width: 100px; height: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <div class="stage">
+    <!-- HOLOGRAMA 3D -->
+    <div class="holo-scene">
+      <div class="holo-bust-wrap">
+        <img src="ironman-holo.png" alt="Holograma Homem de Ferro" class="holo-bust" draggable="false">
+      </div>
+      <div class="holo-beam" id="hologram-beam"></div>
+      <canvas id="particles"></canvas>
+    </div>
+
+    <div class="holo-platform">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+      <div class="ring ring-core"></div>
+    </div>
+
+    <!-- PAINEL -->
+    <div class="main-panel" id="main-panel">
+      <div class="header-status">
+        <span>STARK INDUSTRIES // J.A.R.V.I.S. ULTIMATE CORE</span>
+        <span id="header-emotion-text">ESTADO: ● NEUTRO / ESTÁVEL</span>
+      </div>
+
+      <div class="section-box">
+        <div class="section-title">TERMINAL DE CHAT NUVEM</div>
+        <input type="text" id="command-input" class="input-box" placeholder="Converse livremente com o J.A.R.V.I.S...." onkeypress="handleKeyPress(event)">
+        <button class="btn-stark" onclick="sendToJarvis()">ENVIAR MENSAGEM</button>
+
+        <div class="section-title">CONTROLO DE PLAYER / MÚSICA (ROBÔ)</div>
+        <input type="text" id="music-input" class="input-box" placeholder="Cole o link da música (YouTube/Spotify)...">
+        <div class="btn-group">
+          <button class="btn-stark" onclick="sendMusic('play')">TOCAR / ENVIAR</button>
+          <button class="btn-stark" onclick="sendMusic('skip')">AVANÇAR / TROCAR</button>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <div class="section-title">MATRIZ EMOCIONAL & DIÁLOGO</div>
+        <div class="info-row">HUMOR ATIVO: <strong id="active-mood">NEUTRO / ESTÁVEL</strong></div>
+        <div class="info-row" id="player-status">STATUS DO PLAYER: <strong>STANDBY</strong></div>
+
+        <div class="section-title" style="margin-top:4px;">REGISTO DE CONVERSA:</div>
+        <div id="chat-container" class="chat-history">
+          <div class="chat-message chat-jarvis">
+            <strong>J.A.R.V.I.S.:</strong> Sistemas holográficos e matriz de conversação online, senhor. Como posso auxiliar?
+          </div>
+        </div>
+
+        <button class="btn-stark voice-btn" onclick="toggleVoice()">◈ ATIVAR COMANDO DE VOZ</button>
+        <div id="voice-status">TRANSMISSÃO CONCLUÍDA</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== ÁUDIO =====
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq=800, dur=0.08, type='sine', vol=0.12) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    }
+    function sfx(kind) {
+      if (kind==='click') { playBeep(1200,.05,'square',.09); setTimeout(()=>playBeep(900,.07,'sine',.07),45); }
+      else if (kind==='listen') { playBeep(580,.11,'sawtooth',.1); setTimeout(()=>playBeep(920,.13,'sine',.08),90); }
+      else if (kind==='ok') { playBeep(680,.09,'sine',.1); setTimeout(()=>playBeep(1080,.13,'sine',.08),70); }
+      else if (kind==='err') { playBeep(280,.2,'sawtooth',.13); }
+    }
+
+    // ===== VOZ HOLOGRÁFICA =====
+    function falar(texto) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(texto);
+      u.lang = 'pt-BR';
+      u.rate = 0.92;
+      u.pitch = 0.72;
+      const voices = speechSynthesis.getVoices();
+      const pref = voices.find(v => v.lang.startsWith('pt') && (v.name.toLowerCase().includes('male') || v.name.includes('Ricardo') || v.name.includes('Daniel'))) || voices.find(v => v.lang.startsWith('pt'));
+      if (pref) u.voice = pref;
+      u.onstart = () => sfx('ok');
+      speechSynthesis.speak(u);
+    }
+    speechSynthesis.onvoiceschanged = () => {};
+
+    // ===== EMOÇÃO =====
+    function updateEmotionalState(emotion) {
+      const root = document.documentElement;
+      let color = '#00f3ff', glow = 'rgba(0,243,255,0.75)', beam = 'linear-gradient(to bottom, rgba(0,243,255,.5), rgba(0,180,255,.22) 40%, transparent)', mood = 'NEUTRO / ESTÁVEL';
+      const em = (emotion||'').toLowerCase();
+      if (em.includes('alerta') || em.includes('perigo') || em.includes('raiva') || em.includes('erro')) {
+        color = '#ff3333'; glow = 'rgba(255,51,51,0.75)'; beam = 'linear-gradient(to bottom, rgba(255,51,51,.5), rgba(255,80,80,.2) 40%, transparent)'; mood = 'ALERTA / HOSTIL';
+      } else if (em.includes('alegre') || em.includes('sucesso') || em.includes('otimista') || em.includes('excelente')) {
+        color = '#33ff66'; glow = 'rgba(51,255,102,0.75)'; beam = 'linear-gradient(to bottom, rgba(51,255,102,.5), rgba(80,255,120,.2) 40%, transparent)'; mood = 'OTIMISTA / EFICIENTE';
+      } else if (em.includes('analítico') || em.includes('foco') || em.includes('pensativo')) {
+        color = '#cca6ff'; glow = 'rgba(204,166,255,0.75)'; beam = 'linear-gradient(to bottom, rgba(204,166,255,.5), rgba(180,140,255,.2) 40%, transparent)'; mood = 'ANÁLISE PROFUNDA';
+      }
+      root.style.setProperty('--emotion-color', color);
+      root.style.setProperty('--emotion-glow', glow);
+      document.getElementById('hologram-beam').style.background = beam;
+      document.getElementById('active-mood').innerText = mood;
+      document.getElementById('header-emotion-text').innerText = `ESTADO: ● ${mood}`;
+    }
+
+    function appendToChat(sender, text, isUser=false) {
+      const box = document.getElementById('chat-container');
+      const div = document.createElement('div');
+      div.className = `chat-message ${isUser ? 'chat-user' : 'chat-jarvis'}`;
+      div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // ===== CHAT =====
+    async function sendToJarvis() {
+      const input = document.getElementById('command-input');
+      const prompt = input.value.trim();
+      if (!prompt) return;
+      sfx('click');
+      appendToChat('Senhor', prompt, true);
+      input.value = '';
+      try {
+        const res = await fetch('/api/jarvis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        const data = await res.json();
+        if (res.ok && data.response) {
+          appendToChat('J.A.R.V.I.S.', data.response);
+          falar(data.response);
+          const low = data.response.toLowerCase();
+          if (low.includes('atenção') || low.includes('cuidado') || low.includes('erro') || low.includes('perigo')) updateEmotionalState('alerta');
+          else if (low.includes('excelente') || low.includes('perfeito') || low.includes('ótimo') || low.includes('sucesso')) updateEmotionalState('alegre');
+          else updateEmotionalState('neutro');
+        } else {
+          appendToChat('J.A.R.V.I.S.', `ERRO DO SISTEMA: ${data.error || 'Falha no processamento.'}`);
+          updateEmotionalState('alerta');
+          sfx('err');
+        }
+      } catch (e) {
+        appendToChat('J.A.R.V.I.S.', 'ERRO DE REDE: Ligação com a nuvem Stark interrompida, senhor.');
+        updateEmotionalState('alerta');
+        sfx('err');
+      }
+    }
+
+    async function sendMusic(action) {
+      const musicInput = document.getElementById('music-input');
+      const link = musicInput.value.trim();
+      if (action === 'play' && !link) {
+        appendToChat('J.A.R.V.I.S.', 'Por favor, insira um link de música válido para o robô executar, senhor.');
+        updateEmotionalState('alerta');
+        sfx('err');
+        return;
+      }
+      const promptText = action === 'play' ? `Tocar música do link: ${link}` : `Avançar para a próxima música / trocar faixa no robô.`;
+      if (action === 'play') {
+        document.getElementById('player-status').innerHTML = 'STATUS DO PLAYER: <strong>A REPRODUZIR</strong>';
+        appendToChat('Senhor', `[Música] Tocar link: ${link}`, true);
+        appendToChat('J.A.R.V.I.S.', 'Ligando ao link de áudio e transmitindo para o robô, senhor.');
+        musicInput.value = '';
+        updateEmotionalState('alegre');
+        sfx('ok');
+      } else {
+        document.getElementById('player-status').innerHTML = 'STATUS DO PLAYER: <strong>FAIXA SEGUINTE</strong>';
+        appendToChat('Senhor', '[Música] Avançar / Trocar faixa', true);
+        appendToChat('J.A.R.V.I.S.', 'Comando de salto executado. Avançando para a próxima faixa, senhor.');
+        updateEmotionalState('analítico');
+        sfx('click');
+      }
+      try {
+        await fetch('/api/jarvis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText })
+        });
+      } catch(e) {}
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') sendToJarvis();
+    }
+
+    // ===== VOZ REAL =====
+    function toggleVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Seu navegador não suporta reconhecimento de voz nativo.');
+        return;
+      }
+      sfx('listen');
+      const status = document.getElementById('voice-status');
+      status.innerText = 'OUVINDO COMANDO DE VOZ...';
+      updateEmotionalState('analítico');
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('command-input').value = transcript;
+        status.innerText = 'COMANDO CAPTURADO: ' + transcript;
+        sendToJarvis();
+      };
+      recognition.onerror = () => {
+        status.innerText = 'ERRO DE CAPTAÇÃO DE ÁUDIO';
+        updateEmotionalState('alerta');
+        sfx('err');
+      };
+      recognition.onend = () => {
+        setTimeout(() => { status.innerText = 'TRANSMISSÃO CONCLUÍDA'; }, 1500);
+      };
+      recognition.start();
+    }
+
+    // ===== PARTÍCULAS =====
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() {
+      const r = canvas.getBoundingClientRect();
+      canvas.width = r.width || 280;
+      canvas.height = r.height || 300;
+    }
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x: canvas.width/2 + (Math.random()-0.5)*canvas.width*0.35,
+          y: canvas.height*0.55 + Math.random()*canvas.height*0.4,
+          size: Math.random()*2.2 + 0.5,
+          speedY: -(Math.random()*0.85 + 0.3),
+          speedX: (Math.random()-0.5)*0.4,
+          opacity: Math.random()*0.6 + 0.2,
+          life: Math.random()
+        });
+      }
+    }
+    function animateParticles() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p => {
+        p.y += p.speedY; p.x += p.speedX; p.life += 0.007;
+        if (p.y < canvas.height*0.1 || p.life > 1) {
+          p.y = canvas.height*0.85 + Math.random()*25;
+          p.x = canvas.width/2 + (Math.random()-0.5)*canvas.width*0.4;
+          p.life = 0;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(0,243,255,${p.opacity*(1-p.life)})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      initParticles();
+      animateParticles();
+    });
+    window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+  </script>
+</body>
+</html>

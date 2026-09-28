@@ -1,0 +1,16 @@
+{
+  "name": "jarvis-stark-core",
+  "version": "2.0.0",
+  "description": "J.A.R.V.I.S. Stark Holographic Core Ultimate",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "@google/generative-ai": "^0.21.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
